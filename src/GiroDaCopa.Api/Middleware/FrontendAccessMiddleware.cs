@@ -32,6 +32,14 @@ public sealed class FrontendAccessMiddleware
         var apiKey = _settings.ApiKey;
         if (string.IsNullOrWhiteSpace(apiKey))
         {
+            if (_environment.IsProduction())
+            {
+                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                await context.Response.WriteAsync(
+                    "API indisponível: configure FRONTEND_API_KEY no Render.");
+                return;
+            }
+
             await _next(context);
             return;
         }

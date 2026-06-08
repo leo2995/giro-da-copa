@@ -2,7 +2,10 @@
 # https://render.com/docs/blueprint-spec
 #
 # Deploy: Dashboard → New → Blueprint → conecte o repositório
-# Depois defina FRONTEND_URL com a URL do Netlify (ex.: https://girodacopa.netlify.app)
+# Depois defina no Dashboard do serviço girodacopa-api → Environment:
+#   FRONTEND_URL      = URL do Netlify (ex.: https://girodacopa.netlify.app)
+#   FRONTEND_API_KEY  = chave secreta (gere no painel; copie o mesmo valor para VITE_FRONTEND_API_KEY no Netlify)
+# O generateValue só preenche variáveis novas na criação do Blueprint — serviços já existentes precisam adicionar manualmente.
 
 services:
   - type: web

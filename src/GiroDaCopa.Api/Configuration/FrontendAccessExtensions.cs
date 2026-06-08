@@ -27,17 +27,21 @@ public static class FrontendAccessExtensions
             var apiKey = app.Configuration[FrontendAccessSettings.ApiKeyEnvName]
                 ?? app.Configuration[$"{FrontendAccessSettings.SectionName}:ApiKey"];
             var frontendUrl = app.Configuration["FRONTEND_URL"];
+            var logger = app.Services
+                .GetRequiredService<ILoggerFactory>()
+                .CreateLogger("FrontendAccess");
 
             if (string.IsNullOrWhiteSpace(apiKey))
             {
-                throw new InvalidOperationException(
-                    $"{FrontendAccessSettings.ApiKeyEnvName} é obrigatório em Production.");
+                logger.LogCritical(
+                    "{EnvVar} não configurado. A API ficará indisponível até definir a variável em Render → Environment.",
+                    FrontendAccessSettings.ApiKeyEnvName);
             }
 
             if (string.IsNullOrWhiteSpace(frontendUrl))
             {
-                throw new InvalidOperationException(
-                    "FRONTEND_URL é obrigatório em Production.");
+                logger.LogCritical(
+                    "FRONTEND_URL não configurado. Defina a URL do Netlify em Render → Environment.");
             }
         }
 
