@@ -13,8 +13,10 @@ giro-da-copa/
 │   ├── GiroDaCopa.Domain/
 │   ├── GiroDaCopa.Infrastructure/
 │   └── GiroDaCopa.Persistence/   # EF Core + PostgreSQL
-├── netlify.toml       # Configuração de deploy do frontend
-└── package.json       # Scripts de build na raiz (Netlify)
+├── Dockerfile         # Imagem da API para Render
+├── docker-compose.yml # API + Postgres local
+├── render.yaml        # Blueprint Render (API + DB)
+└── netlify.toml       # Deploy do frontend (quando presente)
 ```
 
 ## Pré-requisitos
@@ -99,18 +101,65 @@ Arquivos `.env`, `.env.local` e `.env.*.local` **não são versionados**.
 
 Build: `npm run build` → publica `frontEnd/dist`
 
-### Backend — produção
+### Backend — Render (Docker)
 
-Configure via variáveis de ambiente no host (Azure, Railway, Render, etc.):
+O repositório inclui `Dockerfile`, `render.yaml` e `docker-compose.yml`.
+
+#### Opção A — Blueprint (recomendado)
+
+1. No [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**
+2. Conecte o repositório — o `render.yaml` cria:
+   - **Web Service** `girodacopa-api` (Docker)
+   - **PostgreSQL** `girodacopa-db`
+3. Após o deploy, em **Environment** do web service, defina:
+   - `FRONTEND_URL` = URL do Netlify (ex.: `https://seu-site.netlify.app`)
+4. No Netlify, defina:
+   - `VITE_API_BASE_URL` = `https://girodacopa-api.onrender.com/api` (sua URL Render + `/api`)
+
+#### Opção B — Web Service manual
+
+| Campo | Valor |
+|---|---|
+| Runtime | Docker |
+| Dockerfile | `./Dockerfile` |
+| Health Check Path | `/health` |
+
+#### Variáveis de ambiente (Render)
+
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `DATABASE_URL` | Sim | Injetada automaticamente pelo Postgres Render |
+| `Jwt__Secret` | Sim | Chave JWT (mín. 32 caracteres) |
+| `Jwt__Issuer` | Sim | `GiroDaCopa` |
+| `Jwt__Audience` | Sim | `GiroDaCopa` |
+| `Admin__Password` | Sim | Senha do admin (seed na 1ª execução) |
+| `Admin__Username` | Não | Padrão: `admin` |
+| `FRONTEND_URL` | Recomendado | URL do frontend para CORS |
+| `ASPNETCORE_ENVIRONMENT` | Sim | `Production` |
+
+Migrations e seed rodam automaticamente no startup.
+
+#### Testar com Docker localmente
+
+```bash
+docker compose up --build
+```
+
+API: `http://localhost:5013` · Swagger: `http://localhost:5013/swagger`
+
+### Backend — outros hosts
+
+Configure via variáveis de ambiente:
 
 | Variável de ambiente | Configuração equivalente |
 |---|---|
-| `ConnectionStrings__Default` | Connection string PostgreSQL |
+| `ConnectionStrings__Default` ou `DATABASE_URL` | PostgreSQL |
 | `Jwt__Secret` | Chave JWT (mín. 32 caracteres) |
 | `Jwt__Issuer` | `GiroDaCopa` |
 | `Jwt__Audience` | `GiroDaCopa` |
 | `Admin__Username` | Usuário admin inicial |
 | `Admin__Password` | Senha admin inicial (seed na 1ª execução) |
+| `PORT` | Porta HTTP (Render define automaticamente) |
 
 Use senhas fortes e **rotacione** qualquer credencial que tenha sido exposta no histórico do Git.
 
@@ -132,15 +181,15 @@ git rm --cached src/GiroDaCopa.Api/appsettings.Development.json 2>/dev/null || t
 ## Scripts úteis
 
 ```bash
-# Raiz — build do frontend (Netlify)
-npm run build
+# Docker — API + PostgreSQL
+docker compose up --build
 
-# Frontend
-cd frontEnd && npm run dev
-cd frontEnd && npm run optimize:assets   # comprimir imagens em public/assets
-
-# Backend
+# Backend local (sem Docker)
 cd src/GiroDaCopa.Api && dotnet run
+
+# Frontend (quando a pasta frontEnd existir)
+cd frontEnd && npm run dev
+cd frontEnd && npm run optimize:assets
 ```
 
 ## Licença

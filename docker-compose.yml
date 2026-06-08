@@ -1,0 +1,40 @@
+# Stack local com Docker (API + PostgreSQL)
+# Uso: docker compose up --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: worldcup
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d worldcup"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    ports:
+      - "5013:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      PORT: "8080"
+      ConnectionStrings__Default: Host=db;Port=5432;Database=worldcup;Username=postgres;Password=postgres
+      Jwt__Issuer: GiroDaCopa
+      Jwt__Audience: GiroDaCopa
+      Jwt__Secret: GiroDaCopa-Local-Docker-Jwt-Secret-Key-32chars!
+      Admin__Username: admin
+      Admin__Password: Admin@123
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

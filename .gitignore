@@ -86,10 +86,10 @@ web_modules/
 
 # Segredos locais do backend (use User Secrets ou variáveis de ambiente)
 src/GiroDaCopa.Api/appsettings.Development.json
-src/GiroDaCopa.Api/appsettings.Production.json
 src/GiroDaCopa.Api/appsettings.*.local.json
 !src/GiroDaCopa.Api/appsettings.Development.json.example
 !src/GiroDaCopa.Api/appsettings.example.json
+!src/GiroDaCopa.Api/appsettings.Production.json
 
 # Cache npm do frontend
 frontEnd/.npm-cache/
