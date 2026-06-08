@@ -41,4 +41,10 @@ public sealed class MatchStatistic : AuditableEntity
 
         UpdatedAt = DateTime.UtcNow;
     }
+
+    public void UpdateValue(decimal value)
+    {
+        Value = value;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

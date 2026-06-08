@@ -26,5 +26,8 @@ public sealed class GroupTeamConfiguration
         builder.HasOne(x => x.Team)
             .WithMany(x => x.Groups)
             .HasForeignKey(x => x.TeamId);
+
+        builder.Ignore(x => x.Points);
+        builder.Ignore(x => x.GoalsDifference);
     }
 }

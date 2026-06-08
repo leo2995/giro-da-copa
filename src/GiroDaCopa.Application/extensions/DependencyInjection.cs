@@ -1,4 +1,6 @@
 using FluentValidation;
+using GiroDaCopa.Application.Common.Behaviors;
+using GiroDaCopa.Application.Common.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -14,10 +16,14 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(
                 Assembly.GetExecutingAssembly());
+
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(
             Assembly.GetExecutingAssembly());
+
+        services.AddScoped<GroupStandingsService>();
 
         return services;
     }

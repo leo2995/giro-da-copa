@@ -15,6 +15,8 @@ public sealed class GiroDaCopaDbContext : DbContext
     public DbSet<City> Cities => Set<City>();
     public DbSet<Stadium> Stadiums => Set<Stadium>();
 
+    public DbSet<Team> Teams => Set<Team>();
+
     public DbSet<Tournament> Tournaments => Set<Tournament>();
 
     public DbSet<Stage> Stages => Set<Stage>();
@@ -30,6 +32,14 @@ public sealed class GiroDaCopaDbContext : DbContext
 
     public DbSet<MatchStatistic> MatchStatistics
     => Set<MatchStatistic>();
+
+    public DbSet<BroadcastChannel> BroadcastChannels
+        => Set<BroadcastChannel>();
+
+    public DbSet<MatchBroadcast> MatchBroadcasts
+        => Set<MatchBroadcast>();
+
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)

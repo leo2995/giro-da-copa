@@ -23,7 +23,11 @@ public sealed class CountryConfiguration
             .IsRequired();
 
         builder.Property(x => x.FifaCode)
-            .HasMaxLength(3)
+            .HasMaxLength(5)
+            .IsRequired();
+
+        builder.Property(x => x.FlagEmoji)
+            .HasMaxLength(10)
             .IsRequired();
     }
 }

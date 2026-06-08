@@ -10,6 +10,8 @@ public sealed class Country : AuditableEntity
 
     public string FifaCode { get; private set; } = string.Empty;
 
+    public string FlagEmoji { get; private set; } = string.Empty;
+
     private Country()
     {
     }
@@ -17,7 +19,8 @@ public sealed class Country : AuditableEntity
     public Country(
         string name,
         string isoCode,
-        string fifaCode)
+        string fifaCode,
+        string flagEmoji = "")
     {
         Id = Guid.NewGuid();
 
@@ -26,6 +29,8 @@ public sealed class Country : AuditableEntity
         IsoCode = isoCode;
 
         FifaCode = fifaCode;
+
+        FlagEmoji = flagEmoji;
 
         CreatedAt = DateTime.UtcNow;
 

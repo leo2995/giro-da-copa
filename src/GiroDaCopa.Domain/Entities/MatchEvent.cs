@@ -17,6 +17,8 @@ public sealed class MatchEvent : AuditableEntity
 
     public string? Description { get; private set; }
 
+    public string? VideoUrl { get; private set; }
+
     public Match Match { get; private set; } = null!;
 
     public Team? Team { get; private set; }
@@ -31,7 +33,8 @@ public sealed class MatchEvent : AuditableEntity
         int minute,
         Guid? teamId = null,
         string? playerName = null,
-        string? description = null)
+        string? description = null,
+        string? videoUrl = null)
     {
         Id = Guid.NewGuid();
 
@@ -46,6 +49,8 @@ public sealed class MatchEvent : AuditableEntity
         PlayerName = playerName;
 
         Description = description;
+
+        VideoUrl = videoUrl;
 
         CreatedAt = DateTime.UtcNow;
 

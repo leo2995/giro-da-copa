@@ -26,6 +26,9 @@ public sealed class MatchEventConfiguration
         builder.Property(x => x.Description)
             .HasMaxLength(500);
 
+        builder.Property(x => x.VideoUrl)
+            .HasMaxLength(500);
+
         builder.HasOne(x => x.Match)
             .WithMany(x => x.Events)
             .HasForeignKey(x => x.MatchId);

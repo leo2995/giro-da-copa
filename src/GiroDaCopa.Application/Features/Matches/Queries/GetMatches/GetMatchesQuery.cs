@@ -1,7 +1,14 @@
-using GiroDaCopa.Application.Features.Matches.DTOs;
+using GiroDaCopa.Application.Common.Dtos;
 using MediatR;
 
 namespace GiroDaCopa.Application.Features.Matches.Queries.GetMatches;
 
-public sealed record GetMatchesQuery()
-    : IRequest<IEnumerable<MatchDto>>;
+public enum MatchCategory
+{
+    All,
+    Group,
+    Bracket
+}
+
+public sealed record GetMatchesQuery(MatchCategory Category = MatchCategory.All)
+    : IRequest<IReadOnlyList<MatchDto>>;

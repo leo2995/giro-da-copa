@@ -22,6 +22,49 @@ namespace GiroDaCopa.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("GiroDaCopa.Domain.Entities.BroadcastChannel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LogoColor")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UrlPlaceholder")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("broadcast_channels", (string)null);
+                });
+
             modelBuilder.Entity("GiroDaCopa.Domain.Entities.City", b =>
                 {
                     b.Property<Guid>("Id")
@@ -65,8 +108,13 @@ namespace GiroDaCopa.Persistence.Migrations
 
                     b.Property<string>("FifaCode")
                         .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)");
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
+                    b.Property<string>("FlagEmoji")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<string>("IsoCode")
                         .IsRequired()
@@ -97,8 +145,8 @@ namespace GiroDaCopa.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<Guid>("TournamentId")
                         .HasColumnType("uuid");
@@ -121,6 +169,24 @@ namespace GiroDaCopa.Persistence.Migrations
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Drawn")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GoalsAgainst")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GoalsFor")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Lost")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Played")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Won")
+                        .HasColumnType("integer");
+
                     b.HasKey("GroupId", "TeamId");
 
                     b.HasIndex("TeamId");
@@ -139,6 +205,14 @@ namespace GiroDaCopa.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("HomeTeamId")
                         .HasColumnType("uuid");
@@ -168,6 +242,11 @@ namespace GiroDaCopa.Persistence.Migrations
 
                     b.HasIndex("AwayTeamId");
 
+                    b.HasIndex("ExternalCode")
+                        .IsUnique();
+
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("HomeTeamId");
 
                     b.HasIndex("StadiumId");
@@ -179,6 +258,21 @@ namespace GiroDaCopa.Persistence.Migrations
                     b.HasIndex("WinnerTeamId");
 
                     b.ToTable("matches", (string)null);
+                });
+
+            modelBuilder.Entity("GiroDaCopa.Domain.Entities.MatchBroadcast", b =>
+                {
+                    b.Property<Guid>("MatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BroadcastChannelId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("MatchId", "BroadcastChannelId");
+
+                    b.HasIndex("BroadcastChannelId");
+
+                    b.ToTable("match_broadcasts", (string)null);
                 });
 
             modelBuilder.Entity("GiroDaCopa.Domain.Entities.MatchEvent", b =>
@@ -212,6 +306,10 @@ namespace GiroDaCopa.Persistence.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -344,6 +442,11 @@ namespace GiroDaCopa.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
                     b.Property<Guid>("CountryId")
                         .HasColumnType("uuid");
 
@@ -364,6 +467,9 @@ namespace GiroDaCopa.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("CountryId");
 
@@ -399,6 +505,41 @@ namespace GiroDaCopa.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("tournaments", (string)null);
+                });
+
+            modelBuilder.Entity("GiroDaCopa.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("GiroDaCopa.Domain.Entities.City", b =>
@@ -450,6 +591,11 @@ namespace GiroDaCopa.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("GiroDaCopa.Domain.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("GiroDaCopa.Domain.Entities.Team", "HomeTeam")
                         .WithMany()
                         .HasForeignKey("HomeTeamId")
@@ -481,6 +627,8 @@ namespace GiroDaCopa.Persistence.Migrations
 
                     b.Navigation("AwayTeam");
 
+                    b.Navigation("Group");
+
                     b.Navigation("HomeTeam");
 
                     b.Navigation("Stadium");
@@ -490,6 +638,25 @@ namespace GiroDaCopa.Persistence.Migrations
                     b.Navigation("Tournament");
 
                     b.Navigation("WinnerTeam");
+                });
+
+            modelBuilder.Entity("GiroDaCopa.Domain.Entities.MatchBroadcast", b =>
+                {
+                    b.HasOne("GiroDaCopa.Domain.Entities.BroadcastChannel", "BroadcastChannel")
+                        .WithMany("Matches")
+                        .HasForeignKey("BroadcastChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GiroDaCopa.Domain.Entities.Match", "Match")
+                        .WithMany("Broadcasts")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BroadcastChannel");
+
+                    b.Navigation("Match");
                 });
 
             modelBuilder.Entity("GiroDaCopa.Domain.Entities.MatchEvent", b =>
@@ -573,6 +740,11 @@ namespace GiroDaCopa.Persistence.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("GiroDaCopa.Domain.Entities.BroadcastChannel", b =>
+                {
+                    b.Navigation("Matches");
+                });
+
             modelBuilder.Entity("GiroDaCopa.Domain.Entities.City", b =>
                 {
                     b.Navigation("Stadiums");
@@ -592,6 +764,8 @@ namespace GiroDaCopa.Persistence.Migrations
 
             modelBuilder.Entity("GiroDaCopa.Domain.Entities.Match", b =>
                 {
+                    b.Navigation("Broadcasts");
+
                     b.Navigation("Events");
 
                     b.Navigation("Score");

@@ -1,0 +1,21 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=5432;Database=worldcup;Username=postgres;Password=SUA_SENHA_DO_BANCO"
+  },
+  "Jwt": {
+    "Issuer": "GiroDaCopa",
+    "Audience": "GiroDaCopa",
+    "Secret": "GERE_UMA_CHAVE_JWT_COM_PELO_MENOS_32_CARACTERES",
+    "ExpirationHours": 8
+  },
+  "Admin": {
+    "Username": "admin",
+    "Password": "DEFINA_UMA_SENHA_FORTE_PARA_O_ADMIN"
+  }
+}

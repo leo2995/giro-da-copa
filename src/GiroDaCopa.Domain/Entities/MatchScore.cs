@@ -17,4 +17,30 @@ public sealed class MatchScore
     private MatchScore()
     {
     }
+
+    public MatchScore(
+        Guid matchId,
+        int homeGoals,
+        int awayGoals,
+        int? homePenaltyGoals = null,
+        int? awayPenaltyGoals = null)
+    {
+        MatchId = matchId;
+        HomeGoals = homeGoals;
+        AwayGoals = awayGoals;
+        HomePenaltyGoals = homePenaltyGoals;
+        AwayPenaltyGoals = awayPenaltyGoals;
+    }
+
+    public void Update(
+        int homeGoals,
+        int awayGoals,
+        int? homePenaltyGoals = null,
+        int? awayPenaltyGoals = null)
+    {
+        HomeGoals = homeGoals;
+        AwayGoals = awayGoals;
+        HomePenaltyGoals = homePenaltyGoals;
+        AwayPenaltyGoals = awayPenaltyGoals;
+    }
 }

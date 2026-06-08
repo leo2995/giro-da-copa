@@ -12,7 +12,7 @@ public sealed class GroupConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Name)
-            .HasMaxLength(10)
+            .HasMaxLength(20)
             .IsRequired();
 
         builder.HasOne(x => x.Tournament)

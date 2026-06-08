@@ -17,6 +17,18 @@ public sealed class MatchConfiguration
         builder.Property(x => x.Status)
             .HasConversion<int>();
 
+        builder.Property(x => x.ExternalCode)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.HasIndex(x => x.ExternalCode)
+            .IsUnique();
+
+        builder.HasOne(x => x.Group)
+            .WithMany()
+            .HasForeignKey(x => x.GroupId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasOne(x => x.Tournament)
             .WithMany()
             .HasForeignKey(x => x.TournamentId);
