@@ -84,6 +84,7 @@ Variáveis do frontend (ver `frontEnd/.env.example`):
 |---|---|
 | `VITE_API_BASE_URL` | URL da API (`/api` em dev com proxy Vite) |
 | `VITE_API_PROXY_TARGET` | Backend local para o proxy (`http://localhost:5013`) |
+| `VITE_FRONTEND_API_KEY` | Chave compartilhada enviada no header `X-Frontend-Key` (mesmo valor de `FRONTEND_API_KEY` no backend) |
 
 Arquivos `.env`, `.env.local` e `.env.*.local` **não são versionados**.
 
@@ -115,6 +116,7 @@ O repositório inclui `Dockerfile`, `render.yaml` e `docker-compose.yml`.
    - `FRONTEND_URL` = URL do Netlify (ex.: `https://seu-site.netlify.app`)
 4. No Netlify, defina:
    - `VITE_API_BASE_URL` = `https://girodacopa-api.onrender.com/api` (sua URL Render + `/api`)
+   - `VITE_FRONTEND_API_KEY` = mesmo valor de `FRONTEND_API_KEY` no Render
 
 #### Opção B — Web Service manual
 
@@ -134,7 +136,8 @@ O repositório inclui `Dockerfile`, `render.yaml` e `docker-compose.yml`.
 | `Jwt__Audience` | Sim | `GiroDaCopa` |
 | `Admin__Password` | Sim | Senha do admin (seed na 1ª execução) |
 | `Admin__Username` | Não | Padrão: `admin` |
-| `FRONTEND_URL` | Recomendado | URL do frontend para CORS |
+| `FRONTEND_URL` | Sim (produção) | URL do frontend para CORS |
+| `FRONTEND_API_KEY` | Sim (produção) | Chave compartilhada com o frontend (`X-Frontend-Key`) |
 | `ASPNETCORE_ENVIRONMENT` | Sim | `Production` |
 
 Migrations e seed rodam automaticamente no startup.
@@ -170,6 +173,7 @@ Use senhas fortes e **rotacione** qualquer credencial que tenha sido exposta no 
 - Não versionar: `bin/`, `obj/`, `.env*`, `appsettings.Development.json`
 - Templates seguros versionados: `appsettings.*.example.json`, `frontEnd/.env.example`
 - Painel admin: `/admin` — protegido por JWT
+- Acesso à API: em produção, o backend exige o header `X-Frontend-Key` (valor de `FRONTEND_API_KEY`) e aceita CORS apenas da URL configurada em `FRONTEND_URL`. O frontend deve enviar a chave em todas as requisições à API (ex.: `headers: { 'X-Frontend-Key': import.meta.env.VITE_FRONTEND_API_KEY }`). O endpoint `/health` permanece aberto para o health check do Render.
 
 Se `appsettings.json`, `bin/` ou `appsettings.Development.json` já foram commitados com segredos, **rotacione** a senha do admin, a chave JWT e a senha do banco. Depois remova do índice do Git:
 

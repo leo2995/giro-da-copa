@@ -17,5 +17,8 @@
   "Admin": {
     "Username": "admin",
     "Password": "DEFINA_UMA_SENHA_FORTE_PARA_O_ADMIN"
+  },
+  "Frontend": {
+    "ApiKey": "girodacopa-local-dev-frontend-key"
   }
 }

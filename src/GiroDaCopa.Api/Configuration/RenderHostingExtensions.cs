@@ -24,34 +24,6 @@ public static class RenderHostingExtensions
         return builder;
     }
 
-    public static IServiceCollection AddGiroDaCopaCors(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        var frontendUrl = configuration["FRONTEND_URL"];
-
-        services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
-            {
-                if (!string.IsNullOrWhiteSpace(frontendUrl))
-                {
-                    policy.WithOrigins(frontendUrl.TrimEnd('/'))
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                }
-                else
-                {
-                    policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                }
-            });
-        });
-
-        return services;
-    }
-
     private static bool LooksLikePostgresUrl(string? value) =>
         !string.IsNullOrWhiteSpace(value) &&
         Regex.IsMatch(value, @"^postgres(ql)?://", RegexOptions.IgnoreCase);

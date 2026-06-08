@@ -31,6 +31,8 @@ services:
         generateValue: true
       - key: FRONTEND_URL
         sync: false
+      - key: FRONTEND_API_KEY
+        generateValue: true
 
 databases:
   - name: girodacopa-db

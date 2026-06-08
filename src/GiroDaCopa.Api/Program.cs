@@ -14,7 +14,7 @@ builder.ConfigureRenderHosting();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddGiroDaCopaCors(builder.Configuration);
+builder.Services.AddGiroDaCopaFrontendAccess(builder.Configuration, builder.Environment);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerWithJwt();
@@ -36,6 +36,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseGiroDaCopaFrontendAccess();
 app.UseAuthentication();
 app.UseAuthorization();
 

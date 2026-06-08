@@ -32,6 +32,7 @@ services:
       Admin__Username: admin
       Admin__Password: Admin@123
       FRONTEND_URL: http://localhost:3000
+      FRONTEND_API_KEY: girodacopa-local-dev-frontend-key
     depends_on:
       db:
         condition: service_healthy
