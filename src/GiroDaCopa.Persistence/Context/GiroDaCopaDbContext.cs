@@ -41,6 +41,12 @@ public sealed class GiroDaCopaDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<Pool> Pools => Set<Pool>();
+
+    public DbSet<PoolMember> PoolMembers => Set<PoolMember>();
+
+    public DbSet<PoolPrediction> PoolPredictions => Set<PoolPrediction>();
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {

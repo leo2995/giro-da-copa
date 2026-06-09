@@ -3,6 +3,7 @@ using System;
 using GiroDaCopa.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GiroDaCopa.Persistence.Migrations
 {
     [DbContext(typeof(GiroDaCopaDbContext))]
-    partial class GiroDaCopaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609171949_AddPoolsFeature")]
+    partial class AddPoolsFeature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

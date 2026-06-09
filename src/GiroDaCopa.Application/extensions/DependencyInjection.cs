@@ -24,6 +24,7 @@ public static class DependencyInjection
             Assembly.GetExecutingAssembly());
 
         services.AddScoped<GroupStandingsService>();
+        services.AddScoped<PoolScoringService>();
 
         return services;
     }
