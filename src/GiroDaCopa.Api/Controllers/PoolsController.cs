@@ -27,6 +27,37 @@ public sealed class PoolsController : ControllerBase
         _poolScoringService = poolScoringService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetMyPools(
+        [FromQuery] Guid? tournamentId,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var query = _context.PoolMembers
+            .Where(x => x.UserId == userId.Value)
+            .Select(x => x.Pool);
+
+        if (tournamentId.HasValue)
+        {
+            query = query.Where(x => x.TournamentId == tournamentId.Value);
+        }
+
+        var pools = await query
+            .Select(pool => new PoolResponse(
+                pool.Id,
+                pool.Name,
+                pool.InviteCode,
+                pool.TournamentId,
+                $"/join/{pool.InviteCode}"))
+            .OrderBy(x => x.Name)
+            .ToListAsync(cancellationToken);
+
+        return Ok(pools);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreatePool(
         [FromBody] CreatePoolRequest request,
