@@ -134,20 +134,23 @@ public sealed class PoolsController : ControllerBase
                 $"/join/{pool.InviteCode}"));
     }
 
-    [HttpGet("{poolId:guid}/matches")]
+    [HttpGet("{poolId}/matches")]
     public async Task<IActionResult> GetPoolMatches(
-        Guid poolId,
+        string poolId,
         CancellationToken cancellationToken)
     {
         var userId = GetUserId();
         if (userId is null)
             return Unauthorized();
 
-        if (!await IsPoolMember(poolId, userId.Value, cancellationToken))
+        if (!TryParseRequiredGuid(poolId, "poolId", out var parsedPoolId, out var validationError))
+            return BadRequest(validationError);
+
+        if (!await IsPoolMember(parsedPoolId, userId.Value, cancellationToken))
             return Forbid();
 
         var pool = await _context.Pools
-            .FirstOrDefaultAsync(x => x.Id == poolId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == parsedPoolId, cancellationToken);
 
         if (pool is null)
             return NotFound("Bolão não encontrado.");
@@ -171,7 +174,7 @@ public sealed class PoolsController : ControllerBase
             .ToListAsync(cancellationToken);
 
         var predictions = await _context.PoolPredictions
-            .Where(x => x.PoolId == poolId && x.UserId == userId.Value)
+            .Where(x => x.PoolId == parsedPoolId && x.UserId == userId.Value)
             .ToDictionaryAsync(x => x.MatchId, cancellationToken);
 
         var response = matches.Select(x =>
@@ -197,10 +200,10 @@ public sealed class PoolsController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPut("{poolId:guid}/predictions/{matchId:guid}")]
+    [HttpPut("{poolId}/predictions/{matchId}")]
     public async Task<IActionResult> UpsertPrediction(
-        Guid poolId,
-        Guid matchId,
+        string poolId,
+        string matchId,
         [FromBody] UpsertPredictionRequest request,
         CancellationToken cancellationToken)
     {
@@ -208,17 +211,23 @@ public sealed class PoolsController : ControllerBase
         if (userId is null)
             return Unauthorized();
 
-        if (!await IsPoolMember(poolId, userId.Value, cancellationToken))
+        if (!TryParseRequiredGuid(poolId, "poolId", out var parsedPoolId, out var poolValidationError))
+            return BadRequest(poolValidationError);
+
+        if (!TryParseRequiredGuid(matchId, "matchId", out var parsedMatchId, out var matchValidationError))
+            return BadRequest(matchValidationError);
+
+        if (!await IsPoolMember(parsedPoolId, userId.Value, cancellationToken))
             return Forbid();
 
         var match = await _context.Matches
-            .FirstOrDefaultAsync(x => x.Id == matchId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == parsedMatchId, cancellationToken);
 
         if (match is null)
             return NotFound("Jogo não encontrado.");
 
         var pool = await _context.Pools
-            .FirstOrDefaultAsync(x => x.Id == poolId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == parsedPoolId, cancellationToken);
 
         if (pool is null)
             return NotFound("Bolão não encontrado.");
@@ -235,15 +244,15 @@ public sealed class PoolsController : ControllerBase
 
         var prediction = await _context.PoolPredictions
             .FirstOrDefaultAsync(
-                x => x.PoolId == poolId && x.UserId == userId.Value && x.MatchId == matchId,
+                x => x.PoolId == parsedPoolId && x.UserId == userId.Value && x.MatchId == parsedMatchId,
                 cancellationToken);
 
         if (prediction is null)
         {
             prediction = new PoolPrediction(
-                poolId,
+                parsedPoolId,
                 userId.Value,
-                matchId,
+                parsedMatchId,
                 request.HomeGoals,
                 request.AwayGoals);
             _context.PoolPredictions.Add(prediction);
@@ -268,20 +277,23 @@ public sealed class PoolsController : ControllerBase
             });
     }
 
-    [HttpGet("{poolId:guid}/ranking")]
+    [HttpGet("{poolId}/ranking")]
     public async Task<IActionResult> GetRanking(
-        Guid poolId,
+        string poolId,
         CancellationToken cancellationToken)
     {
         var userId = GetUserId();
         if (userId is null)
             return Unauthorized();
 
-        if (!await IsPoolMember(poolId, userId.Value, cancellationToken))
+        if (!TryParseRequiredGuid(poolId, "poolId", out var parsedPoolId, out var validationError))
+            return BadRequest(validationError);
+
+        if (!await IsPoolMember(parsedPoolId, userId.Value, cancellationToken))
             return Forbid();
 
         var members = await _context.PoolMembers
-            .Where(x => x.PoolId == poolId)
+            .Where(x => x.PoolId == parsedPoolId)
             .Select(x => new
             {
                 x.UserId,
@@ -290,7 +302,7 @@ public sealed class PoolsController : ControllerBase
             .ToListAsync(cancellationToken);
 
         var predictions = await _context.PoolPredictions
-            .Where(x => x.PoolId == poolId)
+            .Where(x => x.PoolId == parsedPoolId)
             .Select(x => new
             {
                 x.UserId,
@@ -361,6 +373,31 @@ public sealed class PoolsController : ControllerBase
             .AnyAsync(
                 x => x.PoolId == poolId && x.UserId == userId,
                 cancellationToken);
+    }
+
+    private static bool TryParseRequiredGuid(
+        string value,
+        string fieldName,
+        out Guid parsedValue,
+        out string? errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(value)
+            || value.Equals("null", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("undefined", StringComparison.OrdinalIgnoreCase))
+        {
+            parsedValue = Guid.Empty;
+            errorMessage = $"'{fieldName}' é obrigatório.";
+            return false;
+        }
+
+        if (!Guid.TryParse(value, out parsedValue))
+        {
+            errorMessage = $"'{fieldName}' deve ser um GUID válido.";
+            return false;
+        }
+
+        errorMessage = null;
+        return true;
     }
 
     private async Task<string> GenerateUniqueInviteCode(CancellationToken cancellationToken)
