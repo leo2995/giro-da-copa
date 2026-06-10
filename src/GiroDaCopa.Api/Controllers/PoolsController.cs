@@ -46,13 +46,13 @@ public sealed class PoolsController : ControllerBase
         }
 
         var pools = await query
+            .OrderBy(pool => pool.Name)
             .Select(pool => new PoolResponse(
                 pool.Id,
                 pool.Name,
                 pool.InviteCode,
                 pool.TournamentId,
-                $"/join/{pool.InviteCode}"))
-            .OrderBy(x => x.Name)
+                "/join/" + pool.InviteCode))
             .ToListAsync(cancellationToken);
 
         return Ok(pools);
