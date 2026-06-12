@@ -180,11 +180,13 @@ public sealed class PoolsController : ControllerBase
         var response = matches.Select(x =>
         {
             predictions.TryGetValue(x.Id, out var prediction);
-            var canEdit = DateTime.UtcNow <= x.KickoffAt.AddMinutes(-LockMinutesBeforeKickoff);
+            var lockAt = x.KickoffAt.AddMinutes(-LockMinutesBeforeKickoff);
+            var canEdit = DateTime.UtcNow <= lockAt;
             return new PoolMatchResponse(
                 x.Id,
                 x.ExternalCode,
                 x.KickoffAt,
+                lockAt,
                 x.Status.ToString(),
                 x.HomeTeam,
                 x.HomeTeamFlagCode,
@@ -438,6 +440,7 @@ public sealed class PoolsController : ControllerBase
         Guid MatchId,
         string MatchCode,
         DateTime KickoffAt,
+        DateTime LockAt,
         string Status,
         string HomeTeam,
         string HomeTeamFlagCode,
