@@ -89,6 +89,12 @@ public sealed class Match : AuditableEntity
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void UpdateKickoffAt(DateTime kickoffAt)
+    {
+        KickoffAt = kickoffAt;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     public void SetWinner(Guid? winnerTeamId)
     {
         WinnerTeamId = winnerTeamId;

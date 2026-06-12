@@ -1,3 +1,4 @@
+using System.Globalization;
 using GiroDaCopa.Domain.Entities;
 using GiroDaCopa.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,8 @@ namespace GiroDaCopa.Persistence.Seed;
 
 public static class GroupMatchSeeder
 {
+    private static readonly TimeZoneInfo BrazilTimeZone = GetBrazilTimeZone();
+
     private sealed record MatchSeed(
         string Code,
         string GroupName,
@@ -16,16 +19,33 @@ public static class GroupMatchSeeder
 
     public static async Task SeedAsync(GiroDaCopaDbContext context)
     {
-        var existingCodes = await context.Matches
-            .Select(x => x.ExternalCode)
-            .ToHashSetAsync();
+        var seeds = GetMatches();
+        var seedCodes = seeds
+            .Select(x => x.Code)
+            .ToHashSet();
 
-        var pending = GetMatches()
-            .Where(x => !existingCodes.Contains(x.Code))
+        var existingMatches = await context.Matches
+            .Where(x => seedCodes.Contains(x.ExternalCode))
+            .ToDictionaryAsync(x => x.ExternalCode);
+
+        foreach (var seed in seeds)
+        {
+            if (existingMatches.TryGetValue(seed.Code, out var existingMatch)
+                && existingMatch.KickoffAt != seed.KickoffAt)
+            {
+                existingMatch.UpdateKickoffAt(seed.KickoffAt);
+            }
+        }
+
+        var pending = seeds
+            .Where(x => !existingMatches.ContainsKey(x.Code))
             .ToList();
 
         if (pending.Count == 0)
+        {
+            await context.SaveChangesAsync();
             return;
+        }
 
         var tournament = await context.Tournaments.FirstAsync();
         var groupStage = await context.Stages.FirstAsync(x => x.Name == "Group");
@@ -133,6 +153,28 @@ public static class GroupMatchSeeder
         string home,
         string away,
         string stadium,
-        string kickoffUtc) =>
-        new(code, group, home, away, stadium, DateTime.Parse(kickoffUtc).ToUniversalTime());
+        string kickoffAt) =>
+        new(code, group, home, away, stadium, ParseBrazilKickoff(kickoffAt));
+
+    private static DateTime ParseBrazilKickoff(string kickoffAt)
+    {
+        var localText = kickoffAt.TrimEnd('Z');
+        var local = DateTime.SpecifyKind(
+            DateTime.Parse(localText, CultureInfo.InvariantCulture),
+            DateTimeKind.Unspecified);
+
+        return TimeZoneInfo.ConvertTimeToUtc(local, BrazilTimeZone);
+    }
+
+    private static TimeZoneInfo GetBrazilTimeZone()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+        }
+    }
 }
