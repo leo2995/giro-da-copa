@@ -1,4 +1,5 @@
 using GiroDaCopa.Application.Features.Auth.Commands.Login;
+using GiroDaCopa.Application.Features.Auth.Commands.ResetPassword;
 using GiroDaCopa.Application.Abstractions;
 using GiroDaCopa.Persistence.Context;
 using GiroDaCopa.Domain.Entities;
@@ -66,6 +67,25 @@ public sealed class AuthController : ControllerBase
             new { user.Id, user.Username, user.Role });
     }
 
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(
+        [FromBody] ResetPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new ResetPasswordCommand(request.Token, request.NewPassword),
+            cancellationToken);
+
+        return result.Status switch
+        {
+            ResetPasswordResultStatus.Success => Ok(new { message = "Senha redefinida com sucesso." }),
+            ResetPasswordResultStatus.ExpiredToken => BadRequest(new { message = "Token expirado. Solicite um novo link ao administrador." }),
+            ResetPasswordResultStatus.InvalidToken => BadRequest(new { message = "Token inválido ou já utilizado." }),
+            _ => StatusCode(500)
+        };
+    }
+
     public sealed record LoginRequest(string Username, string Password);
     public sealed record RegisterRequest(string Username, string Password);
+    public sealed record ResetPasswordRequest(string Token, string NewPassword);
 }

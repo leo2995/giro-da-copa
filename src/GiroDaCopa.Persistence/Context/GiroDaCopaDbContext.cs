@@ -41,6 +41,8 @@ public sealed class GiroDaCopaDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+
     public DbSet<Pool> Pools => Set<Pool>();
 
     public DbSet<PoolMember> PoolMembers => Set<PoolMember>();
