@@ -1,4 +1,5 @@
 using GiroDaCopa.Application.Features.Admin.Commands.GeneratePasswordResetToken;
+using GiroDaCopa.Application.Features.Admin.Queries.GetUsers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,15 @@ public sealed class AdminController : ControllerBase
     public AdminController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] string? search,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetUsersQuery(search), cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("users/{userId:guid}/password-reset-link")]
