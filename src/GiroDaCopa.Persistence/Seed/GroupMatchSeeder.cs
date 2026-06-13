@@ -92,7 +92,7 @@ public static class GroupMatchSeeder
         M("gm-17", "Group C", "SCO", "BRA", "Hard Rock Stadium", "2026-06-24T19:00:00.000Z"),
         M("gm-18", "Group C", "MAR", "HAI", "Mercedes-Benz Stadium", "2026-06-24T19:00:00.000Z"),
         M("gm-19", "Group D", "USA", "PAR", "SoFi Stadium", "2026-06-12T22:00:00.000Z"),
-        M("gm-20", "Group D", "AUS", "TUR", "BC Place", "2026-06-13T01:00:00.000Z"),
+        M("gm-20", "Group D", "AUS", "TUR", "BC Place", "2026-06-14T01:00:00.000Z"),
         M("gm-21", "Group D", "TUR", "PAR", "Levi's Stadium", "2026-06-19T01:00:00.000Z"),
         M("gm-22", "Group D", "USA", "AUS", "Lumen Field", "2026-06-19T16:00:00.000Z"),
         M("gm-23", "Group D", "TUR", "USA", "SoFi Stadium", "2026-06-25T23:00:00.000Z"),
